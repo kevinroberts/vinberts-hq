@@ -91,7 +91,7 @@ app.use(function(err, req, res, next) {
 // ---------------------Testing------------------------------
 
 // var usersRef = firebase.database().ref('users');
-// var numbers = ['+18478997943'];
+// var numbers = ['+number'];
 //
 // var currentDate = new Date();
 // var currentHour = currentDate.getHours();
