@@ -17,9 +17,7 @@ router.post('/', function (req, res) {
   var resp = new req.app.locals.twilio.TwimlResponse();
   if (_.has(req.body, "From")) {
 
-    var bodyText = req.body.Body.trim().toLowerCase();
-
-    processResponse(resp, bodyText, usersRef, numbers, function (result) {
+    processResponse(req, resp, usersRef, numbers, function (result) {
       res.writeHead(200, {
         'Content-Type': 'text/xml'
       });
@@ -31,21 +29,22 @@ router.post('/', function (req, res) {
   }
 });
 
-function processResponse(resp, bodyText, usersRef, numbers, cb) {
+function processResponse(req, resp, usersRef, numbers, cb) {
   var fromNum = req.body.From;
-
+  var bodyText = req.body.Body.trim().toLowerCase();
   if (bodyText === 'subscribe') {
     if (numbers.indexOf(fromNum) !== -1) {
       resp.message('You are already subscribed!');
+      cb(resp);
     } else {
       resp.message('Thank you, you are now subscribed. Reply "stop" to stop receiving updates. Reply "hour 8" to change hour of daily update.');
       var userObj = {};
       userObj.phone = fromNum;
       userObj.updateHour = _.toSafeInteger(process.env.DEFAULT_HOUR);
       usersRef.push(userObj);
+      cb(resp);
     }
   } else if (matcher.isMatch(bodyText, 'hour *')) {
-
     var hourStr = bodyText.split("hour ")[1];
     var hourNumber = _.toSafeInteger(hourStr);
     if (_.isInteger(hourNumber) && hourNumber < 25) {
@@ -69,12 +68,15 @@ function processResponse(resp, bodyText, usersRef, numbers, cb) {
     }
 
   } else if (matcher.isMatch(bodyText, 'weather')) {
-    weather.getWeatherResponse(function (response) {
+    weather.getWeatherConditionsResponse(function (response) {
       if (response != null) {
-        resp.message(response.message);
+        resp.message({}, function() {
+          this.body(response.message);
+          this.media(response.icon);
+        });
         cb(resp);
       } else {
-        resp.message("Sorry, weather service is currently down.")
+        resp.message("Sorry, weather service is currently down.");
         cb(resp);
       }
     });

@@ -40,7 +40,7 @@ var scheduledMessages = function (firebase, client) {
                 debug('current hour equals subscribers update hour User: ', fireUser);
 
                 // grab weather data from service
-                weather.getWeatherResponse(function (response) {
+                weather.getWeatherConditionsResponse(function (response) {
                   if (response != null) {
 
                     client.messages.create({

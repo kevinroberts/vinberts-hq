@@ -5,9 +5,11 @@ var _ = require('lodash');
 
 module.exports = {
 
-  getWeatherResponse: function (callback) {
+  getWeatherConditionsResponse: function (callback) {
     var response = {};
     var url = S(process.env.WUNDERGROUND_URL).replaceAll("$KEY$", process.env.WUNDERGROUND_KEY).s;
+
+    url = S(url).replaceAll("$TYPE$", 'conditions').s;
 
     unirest.get(url)
       .header("Accept", "application/json")
@@ -39,7 +41,5 @@ module.exports = {
           callback(null);
         }
       });
-
-
   }
 };
