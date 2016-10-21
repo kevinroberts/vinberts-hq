@@ -15,7 +15,6 @@
     "express": "~4.13.4",
     "express-hbs": "^1.0.3",
     "firebase": "^3.5.0",
-    "firebase-cron": "^0.1.2",
     "hbs": "~4.0.0",
     "lodash": "^4.16.4",
     "matcher": "^0.1.2",

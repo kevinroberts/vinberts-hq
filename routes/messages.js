@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var _ = require('lodash');
-const matcher = require('matcher');
 const debug = require('debug')('vinberts-hq');
-
+const matcher = require('matcher');
+var _ = require('lodash');
+var weather = require('../core/weather');
 
 /* GET NOT USED  */
 router.get('/', function (req, res, next) {
@@ -50,6 +50,14 @@ router.post('/', function (req, res) {
         resp.message('Sorry, that is not a valid input. Please use an hour between 1-24');
       }
 
+    } else if (matcher.isMatch(bodyText, 'weather')) {
+      weather.getWeatherResponse(function (response) {
+        if (response != null) {
+          resp.message(response.message);
+        } else {
+          resp.message("Sorry, weather service is currently down.")
+        }
+      });
     } else if (bodyText === 'stopdaily') {
       if (numbers.indexOf(fromNum) !== -1) {
         resp.message('You are now unsubscribed from the daily updates');

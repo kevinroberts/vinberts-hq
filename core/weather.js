@@ -20,7 +20,7 @@ module.exports = {
             responseMsg += " with temperatures currently at " + weatherStatus.temperature_string;
             var precipToday = _.toSafeInteger(weatherStatus.precip_today_in);
             if (precipToday > 0) {
-              responseMsg += " rain in inches predicted: " + weatherStatus.precip_today_in;
+              responseMsg += " precipitation in inches predicted: " + weatherStatus.precip_today_in;
             }
             response.message = responseMsg;
             if (_.has(weatherStatus, 'icon_url')) {
