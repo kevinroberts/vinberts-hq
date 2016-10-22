@@ -74,6 +74,19 @@ function processResponse(req, resp, usersRef, numbers, cb) {
           this.body(response.message);
           this.media(response.icon);
         });
+
+        cb(resp);
+      } else {
+        resp.message("Sorry, weather service is currently down.");
+        cb(resp);
+      }
+    });
+  } else if (matcher.isMatch(bodyText, 'forecast')) {
+    weather.getWeatherForecastResponse(function (response) {
+      if (response != null) {
+
+        resp.message(response.message.substring(0, 160));
+
         cb(resp);
       } else {
         resp.message("Sorry, weather service is currently down.");
