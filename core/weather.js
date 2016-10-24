@@ -51,9 +51,9 @@ module.exports = {
     var response = {};
     var url = S(process.env.WUNDERGROUND_URL).replaceAll("$KEY$", process.env.WUNDERGROUND_KEY).s;
 
+    url = S(url).replaceAll("$TYPE$", 'forecast').s;
     url = S(url).replaceAll("$STATE$", state).s;
     url = S(url).replaceAll("$CITY$", city).s;
-    url = S(url).replaceAll("$TYPE$", 'forecast').s;
 
     unirest.get(url)
       .header("Accept", "application/json")
@@ -81,6 +81,37 @@ module.exports = {
           callback(null);
         }
       });
+  },
 
+  getAstronomyResponse: function(state, city, callback) {
+    var response = {};
+    var url = S(process.env.WUNDERGROUND_URL).replaceAll("$KEY$", process.env.WUNDERGROUND_KEY).s;
+
+    url = S(url).replaceAll("$TYPE$", 'astronomy').s;
+    url = S(url).replaceAll("$STATE$", state).s;
+    url = S(url).replaceAll("$CITY$", city).s;
+
+    unirest.get(url)
+      .header("Accept", "application/json")
+      .end(function (result) {
+        if (result && result.status == 200) {
+          if (_.has(result.body, 'moon_phase')) {
+            var moonFacts = result.body.moon_phase;
+
+            var responseMsg = '';
+
+            responseMsg += 'Sunrise is at ' + moonFacts.sunrise.hour + ':' + moonFacts.sunrise.minute + ' am\n';
+            responseMsg += 'Sunset is at ' + moonFacts.sunset.hour + ':' + moonFacts.sunset.minute + '\n';
+            responseMsg += 'moon phase is ' + moonFacts.phaseofMoon;
+
+            response.message = responseMsg;
+
+            callback(response);
+          }
+        } else {
+          console.error("could not get weather from wunderground ", result.status);
+          callback(null);
+        }
+      });
   }
 };

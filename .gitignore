@@ -34,4 +34,4 @@ npm-debug.log
 /.idea
 *.iml
 *.DS_Store
-resources/*.json
+resources/v*.json

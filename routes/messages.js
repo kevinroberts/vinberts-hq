@@ -5,6 +5,7 @@ const matcher = require('matcher');
 var _ = require('lodash');
 var S = require('string');
 var weather = require('../core/weather');
+var validStates = require('../resources/states_hash.json');
 
 /* GET NOT USED  */
 router.get('/', function (req, res, next) {
@@ -108,6 +109,40 @@ function processResponse(req, resp, usersRef, numbers, cb) {
 
       });
 
+  } else if (matcher.isMatch(bodyText, 'astro')) {
+
+    usersRef.orderByChild('phone').startAt(fromNum)
+      .endAt(fromNum)
+      .once('value', function (snap) {
+        if (snap) {
+          var fireUser = snap.val()[Object.keys(snap.val())[0]];
+          if (_.has(fireUser, 'city')) {
+            weather.getAstronomyResponse(fireUser.state, fireUser.city, function (response) {
+              if (response != null) {
+                resp.message(response.message);
+
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          } else {
+            weather.getAstronomyResponse("IL", "Chicago", function (response) {
+              if (response != null) {
+                resp.message(response.message);
+
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          }
+        }
+
+      });
+
   } else if (matcher.isMatch(bodyText, 'forecast')) {
 
     usersRef.orderByChild('phone').startAt(fromNum)
@@ -152,22 +187,31 @@ function processResponse(req, resp, usersRef, numbers, cb) {
     } else {
       var state = newLocation.split(" ")[0].toUpperCase();
       var city = S(newLocation).replaceAll(newLocation.split(" ")[0] + ' ', '').replaceAll(' ', '_').titleCase().s;
-      usersRef.orderByChild('phone').startAt(fromNum)
-        .endAt(fromNum)
-        .once('value', function (snap) {
-          if (snap) {
-            var updatedUser = {};
-            updatedUser.city = city;
-            updatedUser.state = state;
-            usersRef.child(Object.keys(snap.val())[0]).update(updatedUser, function (resp) {
-              debug("updated subscribed user's city / state to " + city + " " + state);
-            });
-            resp.message('Thanks. Your default location has been updated to ' + city + ', ' + state);
-            cb(resp);
-          }
-        });
-    }
 
+      var validState = validStates[state];
+
+      if (validState) {
+        usersRef.orderByChild('phone').startAt(fromNum)
+          .endAt(fromNum)
+          .once('value', function (snap) {
+            if (snap) {
+              var updatedUser = {};
+              updatedUser.city = city;
+              updatedUser.state = state;
+              usersRef.child(Object.keys(snap.val())[0]).update(updatedUser, function (resp) {
+                debug("updated subscribed user's city / state to " + city + " " + state);
+              });
+              resp.message('Thanks. Your default location has been updated to ' + city + ', ' + state);
+              cb(resp);
+            }
+          });
+      } else {
+        // not a valid state code
+        resp.message('Sorry, that is not a valid state. Say something like "location IL Chicago" STATE CITY');
+        cb(resp);
+      }
+
+    }
 
   } else if (bodyText === 'stopdaily') {
     if (numbers.indexOf(fromNum) !== -1) {
