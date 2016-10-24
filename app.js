@@ -91,13 +91,15 @@ app.use(function(err, req, res, next) {
 // ---------------------Testing------------------------------
 
 // var usersRef = firebase.database().ref('users');
-// var numbers = ['+number'];
+// var numbers = [process.env.TEST_NUMBER];
 //
 // var currentDate = new Date();
 // var currentHour = currentDate.getHours();
 // var _ = require('lodash');
+// var moment = require('moment');
+// var weather = require('./core/weather');
 //
-// weather.getWeatherResponse(function (response) {
+// weather.getWeatherConditionsResponse(function (response) {
 //   if (response != null) {
 //     _.forEach(numbers, function (number) {
 //       usersRef.orderByChild('phone').startAt(number)
@@ -106,11 +108,12 @@ app.use(function(err, req, res, next) {
 //           if (snap) {
 //             var fireUser = snap.val()[Object.keys(snap.val())[0]];
 //
+//             var nowFormat = moment().format("ddd, hA");
 //             client.messages.create({
 //               to: fireUser.phone,
 //               from: process.env.TWILIO_NUMBER,
-//               body: response.message
-//             }, function(err, message) {
+//               body: "scheduled message for " + nowFormat + " : " + response.message
+//             }, function (err, message) {
 //               if (!err) {
 //                 debug('message sent', message.sid);
 //               } else {

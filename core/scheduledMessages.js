@@ -40,24 +40,45 @@ var scheduledMessages = function (firebase, client) {
                 debug('current hour equals subscribers update hour User: ', fireUser);
 
                 // grab weather data from service
-                weather.getWeatherConditionsResponse(function (response) {
-                  if (response != null) {
+                if (_.has(fireUser, 'city')) {
+                  weather.getWeatherConditionsResponse(fireUser.state, fireUser.city, function (response) {
+                    if (response != null) {
+                      var nowFormat = moment().format("ddd, hA");
+                      client.messages.create({
+                        to: fireUser.phone,
+                        from: process.env.TWILIO_NUMBER,
+                        body: "scheduled message for " + nowFormat + " : " + response.message
+                      }, function (err, message) {
+                        if (!err) {
+                          debug('message sent', message.sid);
+                        } else {
+                          debug('error sending message', err);
+                        }
+                      });
 
-                    client.messages.create({
-                      to: fireUser.phone,
-                      from: process.env.TWILIO_NUMBER,
-                      body: "This is your scheduled message for the hour " + response.message
-                    }, function (err, message) {
-                      if (!err) {
-                        debug('message sent', message.sid);
-                      } else {
-                        debug('error sending message', err);
-                      }
-                    });
+                    }
 
-                  }
+                  });
+                } else {
+                  weather.getWeatherConditionsResponse("IL", "Chicago", function (response) {
+                    if (response != null) {
+                      var nowFormat = moment().format("ddd, hA");
+                      client.messages.create({
+                        to: fireUser.phone,
+                        from: process.env.TWILIO_NUMBER,
+                        body: "scheduled message for " + nowFormat + " : " + response.message
+                      }, function (err, message) {
+                        if (!err) {
+                          debug('message sent', message.sid);
+                        } else {
+                          debug('error sending message', err);
+                        }
+                      });
 
-                });
+                    }
+
+                  });
+                }
 
               } else {
                 debug('current hour ' + currentHour + ' does not match the subscribers set hour of ' + fireUser.updateHour);

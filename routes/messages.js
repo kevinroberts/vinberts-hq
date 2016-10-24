@@ -3,6 +3,7 @@ var router = express.Router();
 const debug = require('debug')('vinberts-hq');
 const matcher = require('matcher');
 var _ = require('lodash');
+var S = require('string');
 var weather = require('../core/weather');
 
 /* GET NOT USED  */
@@ -54,7 +55,7 @@ function processResponse(req, resp, usersRef, numbers, cb) {
         .endAt(fromNum)
         .once('value', function (snap) {
           if (snap) {
-            var updatedUser = snap.val();
+            var updatedUser = {};
             updatedUser.updateHour = hourNumber;
             usersRef.child(Object.keys(snap.val())[0]).update(updatedUser, function (resp) {
               debug("updated subscribed user's hour to " + hourNumber);
@@ -68,31 +69,106 @@ function processResponse(req, resp, usersRef, numbers, cb) {
     }
 
   } else if (matcher.isMatch(bodyText, 'weather')) {
-    weather.getWeatherConditionsResponse(function (response) {
-      if (response != null) {
-        resp.message({}, function() {
-          this.body(response.message);
-          this.media(response.icon);
-        });
 
-        cb(resp);
-      } else {
-        resp.message("Sorry, weather service is currently down.");
-        cb(resp);
-      }
-    });
+    usersRef.orderByChild('phone').startAt(fromNum)
+      .endAt(fromNum)
+      .once('value', function (snap) {
+        if (snap) {
+          var fireUser = snap.val()[Object.keys(snap.val())[0]];
+          if (_.has(fireUser, 'city')) {
+            weather.getWeatherConditionsResponse(fireUser.state, fireUser.city, function (response) {
+              if (response != null) {
+                resp.message({}, function() {
+                  this.body(response.message);
+                  this.media(response.icon);
+                });
+
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          } else {
+            weather.getWeatherConditionsResponse("IL", "Chicago", function (response) {
+              if (response != null) {
+                resp.message({}, function() {
+                  this.body(response.message);
+                  this.media(response.icon);
+                });
+
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          }
+        }
+
+      });
+
   } else if (matcher.isMatch(bodyText, 'forecast')) {
-    weather.getWeatherForecastResponse(function (response) {
-      if (response != null) {
 
-        resp.message(response.message.substring(0, 160));
+    usersRef.orderByChild('phone').startAt(fromNum)
+      .endAt(fromNum)
+      .once('value', function (snap) {
+        if (snap) {
+          var fireUser = snap.val()[Object.keys(snap.val())[0]];
+          if (_.has(fireUser, 'city')) {
+            weather.getWeatherForecastResponse(fireUser.state, fireUser.city, function (response) {
+              if (response != null) {
+                resp.message(response.message.substring(0, 160));
 
-        cb(resp);
-      } else {
-        resp.message("Sorry, weather service is currently down.");
-        cb(resp);
-      }
-    });
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          } else {
+            weather.getWeatherForecastResponse("IL", "Chicago", function (response) {
+              if (response != null) {
+                resp.message(response.message.substring(0, 160));
+
+                cb(resp);
+              } else {
+                resp.message("Sorry, weather service is currently down.");
+                cb(resp);
+              }
+            });
+          }
+        }
+
+      });
+
+  } else if (matcher.isMatch(bodyText, 'location *')) {
+    // change users default location
+    var newLocation = S(bodyText).replaceAll("location ", '').s;
+
+    if (!S(newLocation).contains(' ') && newLocation.length > 3) {
+      resp.message('Sorry, that is not a valid input. Say something like "location IL Chicago" STATE CITY');
+      cb(resp);
+    } else {
+      var state = newLocation.split(" ")[0].toUpperCase();
+      var city = S(newLocation).replaceAll(newLocation.split(" ")[0] + ' ', '').replaceAll(' ', '_').titleCase().s;
+      usersRef.orderByChild('phone').startAt(fromNum)
+        .endAt(fromNum)
+        .once('value', function (snap) {
+          if (snap) {
+            var updatedUser = {};
+            updatedUser.city = city;
+            updatedUser.state = state;
+            usersRef.child(Object.keys(snap.val())[0]).update(updatedUser, function (resp) {
+              debug("updated subscribed user's city / state to " + city + " " + state);
+            });
+            resp.message('Thanks. Your default location has been updated to ' + city + ', ' + state);
+            cb(resp);
+          }
+        });
+    }
+
+
   } else if (bodyText === 'stopdaily') {
     if (numbers.indexOf(fromNum) !== -1) {
       resp.message('You are now unsubscribed from the daily updates');

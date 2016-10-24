@@ -5,15 +5,15 @@ var _ = require('lodash');
 
 module.exports = {
 
-  getWeatherConditionsResponse: function (callback) {
+  getWeatherConditionsResponse: function (state, city, callback) {
     var response = {};
 
     // Format of url looks like http://api.wunderground.com/api/$KEY$/$TYPE$/q/$STATE$/$CITY$.json
     var url = S(process.env.WUNDERGROUND_URL).replaceAll("$KEY$", process.env.WUNDERGROUND_KEY).s;
 
     url = S(url).replaceAll("$TYPE$", 'conditions').s;
-    url = S(url).replaceAll("$STATE$", 'IL').s;
-    url = S(url).replaceAll("$CITY$", 'Chicago').s;
+    url = S(url).replaceAll("$STATE$", state).s;
+    url = S(url).replaceAll("$CITY$", city).s;
 
     unirest.get(url)
       .header("Accept", "application/json")
@@ -47,12 +47,12 @@ module.exports = {
       });
   },
 
-  getWeatherForecastResponse: function (callback) {
+  getWeatherForecastResponse: function (state, city, callback) {
     var response = {};
     var url = S(process.env.WUNDERGROUND_URL).replaceAll("$KEY$", process.env.WUNDERGROUND_KEY).s;
 
-    url = S(url).replaceAll("$STATE$", 'IL').s;
-    url = S(url).replaceAll("$CITY$", 'Chicago').s;
+    url = S(url).replaceAll("$STATE$", state).s;
+    url = S(url).replaceAll("$CITY$", city).s;
     url = S(url).replaceAll("$TYPE$", 'forecast').s;
 
     unirest.get(url)
