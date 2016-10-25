@@ -52,7 +52,7 @@ var scheduledMessages = function (firebase, client) {
                         if (!err) {
                           debug('message sent', message.sid);
                         } else {
-                          debug('error sending message', err);
+                          console.error('error sending message', err);
                         }
                       });
 
@@ -71,7 +71,7 @@ var scheduledMessages = function (firebase, client) {
                         if (!err) {
                           debug('message sent', message.sid);
                         } else {
-                          debug('error sending message', err);
+                          console.error('error sending message', err);
                         }
                       });
 

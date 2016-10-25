@@ -39,7 +39,7 @@ function processResponse(req, resp, usersRef, numbers, cb) {
       resp.message('You are already subscribed!');
       cb(resp);
     } else {
-      resp.message('Thank you, you are now subscribed. Reply "stop" to stop receiving updates. Reply "hour 8" to change hour of daily update.');
+      resp.message('Thank you, you are now subscribed. Reply "stop" to stop receiving updates. Reply "hour x" to change hour of daily update.');
       var userObj = {};
       userObj.phone = fromNum;
       userObj.updateHour = _.toSafeInteger(process.env.DEFAULT_HOUR);
@@ -49,7 +49,7 @@ function processResponse(req, resp, usersRef, numbers, cb) {
   } else if (matcher.isMatch(bodyText, 'hour *')) {
     var hourStr = bodyText.split("hour ")[1];
     var hourNumber = _.toSafeInteger(hourStr);
-    if (_.isInteger(hourNumber) && hourNumber < 25) {
+    if (_.isInteger(hourNumber) && hourNumber > 0 && hourNumber < 25) {
       resp.message('Thank you, your daily update hour has been updated to ' + hourStr);
       // process hour preference change
       usersRef.orderByChild('phone').startAt(fromNum)
@@ -177,11 +177,11 @@ function processResponse(req, resp, usersRef, numbers, cb) {
 
       });
 
-  } else if (matcher.isMatch(bodyText, 'location *')) {
+  } else if (matcher.isMatch(bodyText, 'location * *')) {
     // change users default location
     var newLocation = S(bodyText).replaceAll("location ", '').s;
 
-    if (!S(newLocation).contains(' ') && newLocation.length > 3) {
+    if (!S(newLocation).contains(' ')) {
       resp.message('Sorry, that is not a valid input. Say something like "location IL Chicago" STATE CITY');
       cb(resp);
     } else {
@@ -233,7 +233,7 @@ function processResponse(req, resp, usersRef, numbers, cb) {
     }
   }
   else {
-    resp.message('Welcome to Daily Updates. Text "Subscribe" receive updates.');
+    resp.message('Welcome to Daily Updates. Text "Subscribe" receive updates. Change daily update hour by "hour x"');
     cb(resp);
   }
 
