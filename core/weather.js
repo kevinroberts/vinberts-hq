@@ -2,6 +2,7 @@ const debug = require('debug')('vinberts-hq');
 var unirest = require('unirest');
 var S = require('string');
 var _ = require('lodash');
+var moment = require('moment');
 
 module.exports = {
 
@@ -98,10 +99,24 @@ module.exports = {
           if (_.has(result.body, 'moon_phase')) {
             var moonFacts = result.body.moon_phase;
 
+            var now = moment();
+            var sunset = moment();
+            sunset.hours(moonFacts.sunset.hour);
+            sunset.minutes(moonFacts.sunset.minute);
+
             var responseMsg = '';
 
             responseMsg += 'Sunrise is at ' + moonFacts.sunrise.hour + ':' + moonFacts.sunrise.minute + ' am\n';
-            responseMsg += 'Sunset is at ' + moonFacts.sunset.hour + ':' + moonFacts.sunset.minute + '\n';
+            responseMsg += 'Sunset is at ' + sunset.format("h:mm A");
+
+            if (now.diff(sunset) < 0) {
+              // if now() is before sunset - how many hours till sunset?
+              var hoursFromNow = Math.round(sunset.diff(now, 'hours', true) * 10) / 10;
+              responseMsg += " in " + hoursFromNow + " hours from now\n";
+            } else {
+              responseMsg += "\n";
+            }
+
             responseMsg += 'moon phase is ' + moonFacts.phaseofMoon;
 
             response.message = responseMsg;

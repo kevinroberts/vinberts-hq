@@ -90,7 +90,6 @@ app.use(function(err, req, res, next) {
 
 // ---------------------Testing------------------------------
 
-
 // var usersRef = firebase.database().ref('users');
 // var numbers = [process.env.TEST_NUMBER];
 //
@@ -100,7 +99,7 @@ app.use(function(err, req, res, next) {
 // var moment = require('moment');
 // var weather = require('./core/weather');
 //
-// weather.getWeatherConditionsResponse(function (response) {
+// weather.getAstronomyResponse('IL', 'Chicago' ,function (response) {
 //   if (response != null) {
 //     _.forEach(numbers, function (number) {
 //       usersRef.orderByChild('phone').startAt(number)
@@ -113,7 +112,7 @@ app.use(function(err, req, res, next) {
 //             client.messages.create({
 //               to: fireUser.phone,
 //               from: process.env.TWILIO_NUMBER,
-//               body: "scheduled message for " + nowFormat + " : " + response.message
+//               body: "message for " + nowFormat + " : " + response.message
 //             }, function (err, message) {
 //               if (!err) {
 //                 debug('message sent', message.sid);
