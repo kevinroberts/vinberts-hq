@@ -19,6 +19,7 @@
     "lodash": "^4.16.4",
     "matcher": "^0.1.2",
     "moment": "^2.15.1",
+    "moment-precise-range-plugin": "^1.2.0",
     "morgan": "~1.7.0",
     "node-cache": "^4.1.0",
     "serve-favicon": "~2.3.0",

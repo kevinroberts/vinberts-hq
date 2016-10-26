@@ -3,6 +3,7 @@ var unirest = require('unirest');
 var S = require('string');
 var _ = require('lodash');
 var moment = require('moment');
+require('moment-precise-range-plugin');
 
 module.exports = {
 
@@ -111,8 +112,8 @@ module.exports = {
 
             if (now.diff(sunset) < 0) {
               // if now() is before sunset - how many hours till sunset?
-              var hoursFromNow = Math.round(sunset.diff(now, 'hours', true) * 10) / 10;
-              responseMsg += " in " + hoursFromNow + " hours from now\n";
+              var hoursFromNow = moment.preciseDiff(now, sunset);
+              responseMsg += " in " + hoursFromNow + " from now\n";
             } else {
               responseMsg += "\n";
             }

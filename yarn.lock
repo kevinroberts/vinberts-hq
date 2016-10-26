@@ -997,6 +997,10 @@ moment, "moment@>= 2.6.0":
   version "2.15.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.15.1.tgz#e979c2a29e22888e60f396f2220a6118f85cd94c"
 
+moment-precise-range-plugin:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/moment-precise-range-plugin/-/moment-precise-range-plugin-1.2.0.tgz#b091c9e953b908104e418e973b3416daebf23e9a"
+
 moment-timezone@~0.5.5:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.6.tgz#8dcf7bb648d5dcd0f387d6bfd8f3dd9bbba16a86"
