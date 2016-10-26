@@ -99,7 +99,7 @@ app.use(function(err, req, res, next) {
 // var moment = require('moment');
 // var weather = require('./core/weather');
 //
-// weather.getAstronomyResponse('IL', 'Chicago' ,function (response) {
+// weather.getWeatherConditionsResponse('IL', 'Chicago' ,function (response) {
 //   if (response != null) {
 //     _.forEach(numbers, function (number) {
 //       usersRef.orderByChild('phone').startAt(number)

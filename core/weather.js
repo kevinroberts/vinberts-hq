@@ -26,9 +26,9 @@ module.exports = {
             var responseMsg = '';
             responseMsg += "The weather today is " + weatherStatus.weather;
             responseMsg += " with temps currently at " + weatherStatus.temperature_string;
-            var precipToday = _.toSafeInteger(weatherStatus.precip_today_in);
+            var precipToday = _.toNumber(weatherStatus.precip_today_in);
             if (precipToday > 0) {
-              responseMsg += " precip in inches predicted: " + weatherStatus.precip_today_in;
+              responseMsg += " precip predicted: " + weatherStatus.precip_today_in + " inches ☔";
             }
             response.message = responseMsg;
             if (_.has(weatherStatus, 'icon_url')) {
